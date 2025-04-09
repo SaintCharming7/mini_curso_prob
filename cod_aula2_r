@@ -1,0 +1,78 @@
+# Exercício aula 2 (códigos R)
+#install.packages("datasets")
+#install.packages("ggplot2")
+library(datasets)
+library(ggplot2)
+library(reshape2)
+library(moments)
+
+# Fazendo o upload de uma biblioteca pelo R
+# A biblio mtcars contém diferentes modelos de carros e seus atributos
+data("mtcars")
+
+# Verficando o números de fileiras
+nrow(mtcars)
+
+
+# Vamos verificar milhas por galão
+
+mpg <- mtcars$mpg
+mpg
+
+# Vamos verificar algumas estatísticas
+summary(mtcars)
+
+# Agora vamos verificar o IQR
+iqr_value <- IQR(mpg)
+cat("Interquartile Range (IQR):", iqr_value, "\n")
+
+# Create a boxplot
+boxplot_mpg <- ggplot(data = mtcars, aes(y = mpg)) + 
+  geom_boxplot(fill = "skyblue", color = "darkblue") +
+  labs(title = "Boxplot of MPG in mtcars",
+       y = "Miles Per Gallon (MPG)",
+       x = "") +
+  theme_minimal()
+boxplot_mpg
+
+
+# verificando boxplots para todas as colunas
+# Selecionando colunas
+data_r <- mtcars[, c("mpg", "cyl", "disp", "hp", "drat", "wt", "qsec")]
+
+# colocando os dados em formato "long"
+data_long <- melt(data_r)
+
+# Criando boxplots para todas as figuras
+ggplot(data_long, aes(x = variable, y = value, fill = variable)) +
+  geom_boxplot() +
+  labs(title = "Boxplots mtcars",
+       x = "Variáveis",
+       y = "Valores") +
+  theme_minimal() +
+  theme(legend.position = "none")  # Remove legend for clarity
+
+# calculando a variância de mpg
+
+var(mtcars$mpg)
+
+# calculando o desvio padrão de mpg
+
+sd(mtcars$mpg)
+
+# Verificando o histograma de mpg
+
+hist(mtcars$mpg)
+
+# verficiando o histograma de Hp
+hist(mtcars$hp)
+
+
+# verificando assimetria
+
+skewness(mtcars$mpg)
+
+# verificando curtose
+
+kurtosis(mtcars$mpg)
+kurtosis(mtcars$hp)
