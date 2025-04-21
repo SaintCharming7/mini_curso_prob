@@ -1,0 +1,64 @@
+# Exercício aula 5 (códigos R)
+
+# Fazendo o upload de uma biblioteca pelo R
+# A biblio mtcars contém diferentes modelos de carros e seus atributos
+data("mtcars")
+data("warpbreaks")
+
+# verificando a frequencia do câmbio
+table(mtcars$am)
+
+#1: calculando a probabilidade de câmbio manual(successo = 1)
+p <- mean(mtcars$am)
+p  # nossa p Bernoulli
+
+#2: Calculate probability of success and failure calculando a probabilidade sucesso ou falha
+P_success <- p       # P(X = 1)
+P_failure <- 1 - p   # P(X = 0)
+
+#print 
+cat("P(success) =", P_success, "\n")
+cat("P(failure) =", P_failure, "\n")
+
+# 3: formula Bernoulli p/ P(X = x)
+# P(X = x) = p^x * (1 - p)^(1 - x)
+
+bernoulli_prob <- function(x, p) {
+  p^x * (1 - p)^(1 - x)
+}
+
+# prob carro manual(x = 1)?
+bernoulli_prob(1, p)
+
+# prob carro auto (x = 0)?
+bernoulli_prob(0, p)
+
+# Número de ensaions
+n <- 4
+
+# Número de câmbio manual (successo)
+k <- 2
+
+# a distribuição binomial
+prob_2_manuals <- dbinom(k, size = n, prob = p)
+cat("P(2 manuals out of 4 cars) =", round(prob_2_manuals, 4), "\n")
+
+# distribuição Poisson
+
+
+
+# 1: calculando a média (lambda)
+lambda <- mean(warpbreaks$breaks)
+lambda
+
+# 2: formula de Poisson p/ P(X = k)
+# P(X = k) = (e^-lambda * lambda^k) / k!
+
+poisson_prob <- function(k, lambda) {
+  (exp(-lambda) * lambda^k) / factorial(k)
+}
+
+# Qual é a probabilidade de exatamente 20 breaks (dobras)?
+poisson_prob(20, lambda)
+
+
