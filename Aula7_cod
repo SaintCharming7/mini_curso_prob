@@ -1,0 +1,96 @@
+# Aula 7
+set.seed(123)  # Para reproduzibilidade
+library(ggplot2)
+library(gridExtra)
+
+# Simulação da Lei dos Grandes Números (LGN)
+# A LGN stabelece que a média amostral converge para o valor esperado à medida que o tamanho da amostra aumenta.
+
+lgn_simulacao <- function(distribuicao = "normal", n_max = 1000, n_rep = 1000) {
+  medias <- numeric(n_max)
+  
+  for (n in 1:n_max) {
+    if (distribuicao == "normal") {
+      amostra <- rnorm(n)
+      valor_esperado <- 0
+    } else if (distribuicao == "exponencial") {
+      amostra <- rexp(n, rate = 1)
+      valor_esperado <- 1
+    } else if (distribuicao == "bernoulli") {
+      amostra <- rbinom(n, size = 1, prob = 0.3)
+      valor_esperado <- 0.3
+    }
+    
+    # Calcular média para cada tamanho de amostra
+    medias[n] <- mean(amostra)
+  }
+  
+  # Criar gráfico
+ggplot(data.frame(n = 1:n_max, Media = medias), aes(n, Media)) +
+    geom_line(color = "blue") +
+    geom_hline(yintercept = valor_esperado, linetype = "dashed", color = "red") +
+    labs(title = paste("Lei dos Grandes Números - Distribuição", distribuicao),
+         x = "Tamanho da amostra (n)",
+         y = "Média amostral") +
+    theme_minimal()
+}
+
+# Exemplos:
+lgn_normal <- lgn_simulacao("normal")
+lgn_exponencial <- lgn_simulacao("exponencial")
+lgn_bernoulli <- lgn_simulacao("bernoulli")
+
+# Mostrar os gráficos
+grid.arrange(lgn_normal, lgn_exponencial, lgn_bernoulli, ncol = 1)
+
+# O TLC estabelece que a distribuição da média amostral padronizada tende a uma distribuição normal padrão, 
+#independentemente da distribuição original.
+
+# Simulação do Teorema do Limite Central
+# Função corrigida para simular o Teorema do Limite Central
+tlc_simulacao <- function(distribuicao = "exponencial", tamanho_amostra = 30, n_rep = 1000) {
+  medias <- numeric(n_rep)
+  
+  for (i in 1:n_rep) {
+    if (distribuicao == "exponencial") {
+      amostra <- rexp(tamanho_amostra, rate = 1)
+      mu <- 1       # Média teórica
+      sigma <- 1    # Desvio padrão teórico
+    } else if (distribuicao == "bernoulli") {
+      amostra <- rbinom(tamanho_amostra, size = 1, prob = 0.3)
+      mu <- 0.3     # Média teórica
+      sigma <- sqrt(0.3 * 0.7)  # Desvio padrão teórico
+    } else if (distribuicao == "uniforme") {
+      amostra <- runif(tamanho_amostra, min = 0, max = 10)
+      mu <- 5       # Média teórica
+      sigma <- sqrt((10^2)/12)  # Desvio padrão teórico
+    }
+    
+    # Calcular média padronizada
+    medias[i] <- (mean(amostra) - mu) / (sigma / sqrt(tamanho_amostra))
+  }
+  
+  # Criar gráficos
+  dados <- data.frame(Medias_Padronizadas = medias)
+  
+  hist <- ggplot(dados, aes(x = Medias_Padronizadas)) +
+    geom_histogram(aes(y = ..density..), bins = 30, fill = "lightblue", color = "black") +
+    stat_function(fun = dnorm, color = "red", size = 1) +
+    labs(title = paste("TLC -", distribuicao, "- n =", tamanho_amostra),
+         x = "Média amostral padronizada",
+         y = "Densidade") +
+    theme_minimal()
+  
+  qq <- ggplot(dados, aes(sample = Medias_Padronizadas)) +
+    stat_qq() + stat_qq_line(color = "red") +
+    labs(title = "Q-Q Plot vs. Normal") +
+    theme_minimal()
+  
+  grid.arrange(hist, qq, ncol = 2)
+}
+
+# Exemplos (agora deve funcionar):
+tlc_exponencial <- tlc_simulacao("exponencial")
+tlc_bernoulli <- tlc_simulacao("bernoulli")
+tlc_uniforme <- tlc_simulacao("uniforme")
+
